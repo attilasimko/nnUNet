@@ -1,3 +1,4 @@
+from comet_ml import Experiment
 import inspect
 import multiprocessing
 import os
@@ -1007,6 +1008,7 @@ class nnUNetTrainer(object):
         self.logger.log('mean_fg_dice', mean_fg_dice, self.current_epoch)
         self.logger.log('dice_per_class_or_region', global_dc_per_class, self.current_epoch)
         self.logger.log('val_losses', loss_here, self.current_epoch)
+        self.experiment.log_metric({'val_dice': round(mean_fg_dice, 2)}, epoch=self.current_epoch)
 
     def on_epoch_start(self):
         self.logger.log('epoch_start_timestamps', time(), self.current_epoch)
@@ -1231,6 +1233,9 @@ class nnUNetTrainer(object):
         compute_gaussian.cache_clear()
 
     def run_training(self):
+        self.print_to_log_file("Starting comet experiment...")
+        self.experiment = Experiment(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name="miqa")
+
         self.on_train_start()
 
         for epoch in range(self.current_epoch, self.num_epochs):
