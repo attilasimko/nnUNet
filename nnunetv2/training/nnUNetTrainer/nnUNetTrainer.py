@@ -1008,7 +1008,7 @@ class nnUNetTrainer(object):
         self.logger.log('mean_fg_dice', mean_fg_dice, self.current_epoch)
         self.logger.log('dice_per_class_or_region', global_dc_per_class, self.current_epoch)
         self.logger.log('val_losses', loss_here, self.current_epoch)
-        self.experiment.log_metric({'val_dice': mean_fg_dice}, epoch=self.current_epoch)
+        # self.experiment.log_metric({'val_dice': mean_fg_dice}, epoch=self.current_epoch)
 
     def on_epoch_start(self):
         self.logger.log('epoch_start_timestamps', time(), self.current_epoch)
