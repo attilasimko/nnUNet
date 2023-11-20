@@ -1018,8 +1018,7 @@ class nnUNetTrainer(object):
         # todo find a solution for this stupid shit
         self.print_to_log_file('train_loss', np.round(self.logger.my_fantastic_logging['train_losses'][-1], decimals=4))
         self.print_to_log_file('val_loss', np.round(self.logger.my_fantastic_logging['val_losses'][-1], decimals=4))
-        self.print_to_log_file('Pseudo dice', [np.round(i, decimals=4) for i in
-                                               self.logger.my_fantastic_logging['dice_per_class_or_region'][-1]])
+        self.print_to_log_file('combined_val_dice', np.round(np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1]), decimals=4))
         self.experiment.log_metrics({"training_dice": self.logger.my_fantastic_logging['train_losses'][-1]}, epoch=self.current_epoch)
         self.experiment.log_metrics({"val_dice": self.logger.my_fantastic_logging['val_losses'][-1]}, epoch=self.current_epoch)
         self.experiment.log_metrics({"combined_val_dice":  np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)

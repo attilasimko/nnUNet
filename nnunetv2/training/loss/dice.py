@@ -77,7 +77,7 @@ class MemoryEfficientSoftDiceLoss(nn.Module):
         indices = torch.unique(y_full).int()
         indices = indices[indices != 0]
         indices = indices[torch.randperm(indices.shape[0])]
-        indices = indices[:2]
+        
         for idx in indices:
             x = x_full[:, idx:idx+1, :, :]
             y = y_full == idx
