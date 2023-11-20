@@ -1022,12 +1022,18 @@ class nnUNetTrainer(object):
         self.experiment.log_metrics({"training_dice": self.logger.my_fantastic_logging['train_losses'][-1]}, epoch=self.current_epoch)
         self.experiment.log_metrics({"val_dice": self.logger.my_fantastic_logging['val_losses'][-1]}, epoch=self.current_epoch)
         self.experiment.log_metrics({"combined_val_dice":  np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)
+        
+        print()
+        
+        
         for label, idx in self.dataset_json["labels"].items():
-            if (np.isnan(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx])):
+            if (idx == 0):
+                continue
+
+            if (np.isnan(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1])):
                 self.experiment.log_metrics({label:  -1}, epoch=self.current_epoch)
             else:
-                self.experiment.log_metrics({label:  self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx]}, epoch=self.current_epoch)
-            print(f"{label} - {idx}")
+                self.experiment.log_metrics({label:  self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1]}, epoch=self.current_epoch)
         self.print_to_log_file(
             f"Epoch time: {np.round(self.logger.my_fantastic_logging['epoch_end_timestamps'][-1] - self.logger.my_fantastic_logging['epoch_start_timestamps'][-1], decimals=2)} s")
 
