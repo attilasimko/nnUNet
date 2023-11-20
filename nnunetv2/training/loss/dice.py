@@ -79,7 +79,7 @@ class MemoryEfficientSoftDiceLoss(nn.Module):
         indices = indices[torch.randperm(indices.shape[0])]
         indices = indices[:2]
         for idx in indices:
-            x = torch.index_select(x_full, 1, idx)
+            x = x[:, idx:idx+1, :, :]
             y = y_full == idx
 
             # make everything shape (b, c)
