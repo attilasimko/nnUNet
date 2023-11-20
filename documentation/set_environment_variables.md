@@ -32,6 +32,13 @@ export nnUNet_raw="/data/attila/nnUNet_raw"
 export nnUNet_preprocessed="/data/attila/nnUNet_preprocessed"
 export nnUNet_results="/data/attila/nnUNet_results"
 ```
+
+
+```bash
+export nnUNet_raw="/mimer/NOBACKUP/groups/naiss2023-6-64/nnUNet_raw"
+export nnUNet_preprocessed="/mimer/NOBACKUP/groups/naiss2023-6-64/nnUNet_preprocessed"
+export nnUNet_results="/mimer/NOBACKUP/groups/naiss2023-6-64/nnUNet_results"
+```
 (Of course you need to adapt the paths to the actual folders you intend to use).
 
 Important: These variables will be deleted if you close your terminal! They will also only apply to the current 
