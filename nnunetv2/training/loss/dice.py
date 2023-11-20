@@ -69,49 +69,58 @@ class MemoryEfficientSoftDiceLoss(nn.Module):
         self.smooth = smooth
         self.ddp = ddp
 
-    def forward(self, x, y, loss_mask=None):
+    def forward(self, x_full, y_full, loss_mask=None):
         if self.apply_nonlin is not None:
-            x = self.apply_nonlin(x)
+            x_full = self.apply_nonlin(x_full)
+        
+        dc = 0
+        indices = torch.unique(y_full).int()
+        indices = indices[indices != 0]
+        indices = indices[torch.randperm(indices.shape[0])]
+        
+        for idx in indices:
+            x = torch.index_select(x_full, 1, idx)
+            y = y_full == idx
 
-        # make everything shape (b, c)
-        axes = list(range(2, len(x.shape)))
-        with torch.no_grad():
-            if len(x.shape) != len(y.shape):
-                y = y.view((y.shape[0], 1, *y.shape[1:]))
+            # make everything shape (b, c)
+            axes = list(range(2, len(x.shape)))
+            with torch.no_grad():
+                if len(x.shape) != len(y.shape):
+                    y = y.view((y.shape[0], 1, *y.shape[1:]))
 
-            if x.shape == y.shape:
-                # if this is the case then gt is probably already a one hot encoding
-                y_onehot = y
-            else:
-                gt = y.long()
-                y_onehot = torch.zeros(x.shape, device=x.device, dtype=torch.bool)
-                y_onehot.scatter_(1, gt, 1)
+                if x.shape == y.shape:
+                    # if this is the case then gt is probably already a one hot encoding
+                    y_onehot = y == idx
+                else:
+                    gt = y.long()
+                    y_onehot = torch.zeros(x.shape, device=x.device, dtype=torch.bool)
+                    y_onehot.scatter_(1, gt, 1)
 
+                if not self.do_bg:
+                    y_onehot = y_onehot[:, 1:]
+
+                sum_gt = y_onehot.sum(axes) if loss_mask is None else (y_onehot * loss_mask).sum(axes)
+
+            # this one MUST be outside the with torch.no_grad(): context. Otherwise no gradients for you
             if not self.do_bg:
-                y_onehot = y_onehot[:, 1:]
+                x = x[:, 1:]
 
-            sum_gt = y_onehot.sum(axes) if loss_mask is None else (y_onehot * loss_mask).sum(axes)
+            intersect = (x * y_onehot).sum(axes) if loss_mask is None else (x * y_onehot * loss_mask).sum(axes)
+            sum_pred = x.sum(axes) if loss_mask is None else (x * loss_mask).sum(axes)
 
-        # this one MUST be outside the with torch.no_grad(): context. Otherwise no gradients for you
-        if not self.do_bg:
-            x = x[:, 1:]
+            if self.ddp and self.batch_dice:
+                intersect = AllGatherGrad.apply(intersect).sum(0)
+                sum_pred = AllGatherGrad.apply(sum_pred).sum(0)
+                sum_gt = AllGatherGrad.apply(sum_gt).sum(0)
 
-        intersect = (x * y_onehot).sum(axes) if loss_mask is None else (x * y_onehot * loss_mask).sum(axes)
-        sum_pred = x.sum(axes) if loss_mask is None else (x * loss_mask).sum(axes)
+            if self.batch_dice:
+                intersect = intersect.sum(0)
+                sum_pred = sum_pred.sum(0)
+                sum_gt = sum_gt.sum(0)
 
-        if self.ddp and self.batch_dice:
-            intersect = AllGatherGrad.apply(intersect).sum(0)
-            sum_pred = AllGatherGrad.apply(sum_pred).sum(0)
-            sum_gt = AllGatherGrad.apply(sum_gt).sum(0)
+            dc_c = (2 * intersect + self.smooth) / (torch.clip(sum_gt + sum_pred + self.smooth, 1e-8))
 
-        if self.batch_dice:
-            intersect = intersect.sum(0)
-            sum_pred = sum_pred.sum(0)
-            sum_gt = sum_gt.sum(0)
-
-        dc = (2 * intersect + self.smooth) / (torch.clip(sum_gt + sum_pred + self.smooth, 1e-8))
-
-        dc = dc.mean()
+            dc += dc_c.mean()
         return -dc
 
 

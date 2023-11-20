@@ -22,9 +22,15 @@ If you are using a different shell, such as zsh, you will need to find the corre
 ## Temporary
 Just execute the following lines whenever you run nnU-Net:
 ```bash
-export nnUNet_raw="/media/fabian/nnUNet_raw"
-export nnUNet_preprocessed="/media/fabian/nnUNet_preprocessed"
-export nnUNet_results="/media/fabian/nnUNet_results"
+export nnUNet_raw="/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/DSets/nnUNet_raw"
+export nnUNet_preprocessed="/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/DSets/nnUNet_preprocessed"
+export nnUNet_results="/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/DSets/nnUNet_results"
+```
+
+```bash
+export nnUNet_raw="/data/attila/nnUNet_raw"
+export nnUNet_preprocessed="/data/attila/nnUNet_preprocessed"
+export nnUNet_results="/data/attila/nnUNet_results"
 ```
 (Of course you need to adapt the paths to the actual folders you intend to use).
 
