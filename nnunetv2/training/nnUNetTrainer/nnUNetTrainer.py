@@ -350,7 +350,7 @@ class nnUNetTrainer(object):
                                    dice_class=MemoryEfficientSoftDiceLoss)
         else:
             loss = DC_and_CE_loss({'batch_dice': self.configuration_manager.batch_dice,
-                                   'smooth': 1e-5, 'do_bg': False, 'ddp': self.is_ddp}, {}, weight_ce=1, weight_dice=1,
+                                   'smooth': 1e-5, 'do_bg': True, 'ddp': self.is_ddp}, {}, weight_ce=1, weight_dice=1,
                                   ignore_label=self.label_manager.ignore_label, dice_class=MemoryEfficientSoftDiceLoss)
 
         deep_supervision_scales = self._get_deep_supervision_scales()
@@ -1015,12 +1015,9 @@ class nnUNetTrainer(object):
     def on_epoch_end(self):
         self.logger.log('epoch_end_timestamps', time(), self.current_epoch)
 
-        print(np.round(self.logger.my_fantastic_logging['val_losses'][-1], decimals=4))
-        print(np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1]))
-        
         # todo find a solution for this stupid shit
-        self.experiment.log_metric({"val_dice": np.round(self.logger.my_fantastic_logging['val_losses'][-1], decimals=4)}, epoch=self.current_epoch)
-        self.experiment.log_metric({"combined_val_dice":  np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)
+        # self.experiment.log_metric({"val_dice": self.logger.my_fantastic_logging['val_losses'][-1]}, epoch=self.current_epoch)
+        # self.experiment.log_metric({"combined_val_dice":  np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)
         self.print_to_log_file('train_loss', np.round(self.logger.my_fantastic_logging['train_losses'][-1], decimals=4))
         self.print_to_log_file('val_loss', np.round(self.logger.my_fantastic_logging['val_losses'][-1], decimals=4))
         self.print_to_log_file('Pseudo dice', [np.round(i, decimals=4) for i in
