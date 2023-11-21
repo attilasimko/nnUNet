@@ -1025,15 +1025,16 @@ class nnUNetTrainer(object):
         
         print()
         
-        
+        map_loss = dict()
         for label, idx in self.dataset_json["labels"].items():
             if (idx == 0):
                 continue
-
             if (np.isnan(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1])):
-                self.experiment.log_metrics({label:  -1}, epoch=self.current_epoch)
+                map_loss.update({label: -1})
             else:
-                self.experiment.log_metrics({label:  self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1]}, epoch=self.current_epoch)
+                map_loss.update({label:  int(100 * self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1])})
+        self.experiment.log_metrics(map_loss, epoch=current_epoch)
+
         self.print_to_log_file(
             f"Epoch time: {np.round(self.logger.my_fantastic_logging['epoch_end_timestamps'][-1] - self.logger.my_fantastic_logging['epoch_start_timestamps'][-1], decimals=2)} s")
 
