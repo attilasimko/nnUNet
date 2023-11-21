@@ -1019,12 +1019,9 @@ class nnUNetTrainer(object):
         self.print_to_log_file('train_loss', np.round(self.logger.my_fantastic_logging['train_losses'][-1], decimals=4))
         self.print_to_log_file('val_loss', np.round(self.logger.my_fantastic_logging['val_losses'][-1], decimals=4))
         self.print_to_log_file('combined_val_dice', np.round(np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1]), decimals=4))
-        self.experiment.log_metrics({"training_dice": self.logger.my_fantastic_logging['train_losses'][-1]}, epoch=self.current_epoch)
-        self.experiment.log_metrics({"val_dice": self.logger.my_fantastic_logging['val_losses'][-1]}, epoch=self.current_epoch)
-        self.experiment.log_metrics({"combined_val_dice":  np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)
-        
-        print()
-        
+        self.experiment.log_metrics({"training_dice": 100 * self.logger.my_fantastic_logging['train_losses'][-1]}, epoch=self.current_epoch)
+        self.experiment.log_metrics({"val_dice": 100 * self.logger.my_fantastic_logging['val_losses'][-1]}, epoch=self.current_epoch)
+        self.experiment.log_metrics({"combined_val_dice":  100 * np.nanmean(self.logger.my_fantastic_logging['dice_per_class_or_region'][-1])}, epoch=self.current_epoch)
         map_loss = dict()
         for label, idx in self.dataset_json["labels"].items():
             if (idx == 0):
@@ -1033,7 +1030,7 @@ class nnUNetTrainer(object):
                 map_loss.update({label: -1})
             else:
                 map_loss.update({label:  int(100 * self.logger.my_fantastic_logging['dice_per_class_or_region'][-1][idx - 1])})
-        self.experiment.log_metrics(map_loss, epoch=current_epoch)
+        self.experiment.log_metrics(map_loss, epoch=self.current_epoch)
 
         self.print_to_log_file(
             f"Epoch time: {np.round(self.logger.my_fantastic_logging['epoch_end_timestamps'][-1] - self.logger.my_fantastic_logging['epoch_start_timestamps'][-1], decimals=2)} s")

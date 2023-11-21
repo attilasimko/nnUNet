@@ -121,7 +121,7 @@ class MemoryEfficientSoftDiceLoss(nn.Module):
             dc_c = (2 * intersect + self.smooth) / (torch.clip(sum_gt + sum_pred + self.smooth, 1e-8))
 
             dc += dc_c.mean()
-        return -dc.mean()
+        return -dc / len(indices)
 
 
 def get_tp_fp_fn_tn(net_output, gt, axes=None, mask=None, square=False):
