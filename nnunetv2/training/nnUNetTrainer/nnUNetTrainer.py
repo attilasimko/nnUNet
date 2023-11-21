@@ -1252,6 +1252,7 @@ class nnUNetTrainer(object):
         self.on_train_start()
 
         for epoch in range(self.current_epoch, self.num_epochs):
+            self.experiment.set_epoch(epoch)
             self.on_epoch_start()
 
             self.on_train_epoch_start()
