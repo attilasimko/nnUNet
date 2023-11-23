@@ -177,9 +177,6 @@ def get_tp_fp_fn_tn(net_output, gt, axes=None, mask=None, square=False):
         fn = fn.sum(dim=axes, keepdim=False)
         tn = tn.sum(dim=axes, keepdim=False)
 
-    print(tp.shape)
-    print(y_onehot.shape)
-
     tp = tp * torch.sum(y_onehot, dim=axes, keepdim=False)
     fp = fp * torch.sum(y_onehot, dim=axes, keepdim=False)
     fn = fn * torch.sum(y_onehot, dim=axes, keepdim=False)
