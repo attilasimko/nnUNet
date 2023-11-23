@@ -55,7 +55,7 @@ class DC_and_CE_loss(nn.Module):
             indices = indices[indices != 0]
             indices = indices[torch.randperm(indices.shape[0])]
 
-            for idx in range(input.shape[1]):
+            for idx in range(net_output_dice.shape[1]):
                 if idx not in indices:
                     net_output_dice[batch_idx, idx, :, :] = 0
 
