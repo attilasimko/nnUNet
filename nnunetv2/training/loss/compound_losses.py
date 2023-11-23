@@ -53,10 +53,20 @@ class DC_and_CE_loss(nn.Module):
         print("target_dice.shape: ", target_dice.shape)
         print("target.shape: ", target.shape)
 
-        dc_loss = self.dc(net_output, target_dice, loss_mask=mask) \
-            if self.weight_dice != 0 else 0
-        ce_loss = self.ce(net_output, target[:, 0].long()) \
-            if self.weight_ce != 0 and (self.ignore_label is None or num_fg > 0) else 0
+        indices = torch.unique(target).int()
+        indices = indices[indices != 0]
+        indices = indices[torch.randperm(indices.shape[0])]
+        
+        dc_loss = 0
+        ce_loss = 0
+        for idx in indices:
+            net_output_idx = net_output[:, idx:idx+1, :, :]
+            target_idx = target == idx
+
+            dc_loss += self.dc(net_output_idx, target_idx, loss_mask=mask) / len(indices) \
+                if self.weight_dice != 0 else 0
+            ce_loss += self.ce(net_output_idx, target_idx[:, 0].long()) / len(indices) \
+                if self.weight_ce != 0 and (self.ignore_label is None or num_fg > 0) else 0
 
         result = self.weight_ce * ce_loss + self.weight_dice * dc_loss
         return result
