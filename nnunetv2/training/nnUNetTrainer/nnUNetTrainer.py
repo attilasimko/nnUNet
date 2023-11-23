@@ -1045,11 +1045,15 @@ class nnUNetTrainer(object):
             self._best_ema = self.logger.my_fantastic_logging['ema_fg_dice'][-1]
             self.print_to_log_file(f"Yayy! New best EMA pseudo Dice: {np.round(self._best_ema, decimals=4)}")
             self.save_checkpoint(join(self.output_folder, 'checkpoint_best.pth'))
+            self.export_model(self.output_folder)
 
         if self.local_rank == 0:
             self.logger.plot_progress_png(self.output_folder)
 
         self.current_epoch += 1
+
+    def export_model(self, path):
+        print(path)
 
     def save_checkpoint(self, filename: str) -> None:
         if self.local_rank == 0:
