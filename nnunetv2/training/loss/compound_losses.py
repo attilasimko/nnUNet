@@ -49,10 +49,6 @@ class DC_and_CE_loss(nn.Module):
             target_dice = target
             mask = None
 
-        print("net_output.shape: ", net_output.shape)
-        print("target_dice.shape: ", target_dice.shape)
-        print("target.shape: ", target.shape)
-
         indices = torch.unique(target).int()
         indices = indices[indices != 0]
         indices = indices[torch.randperm(indices.shape[0])]
