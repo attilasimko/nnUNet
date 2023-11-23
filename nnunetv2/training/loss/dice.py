@@ -150,7 +150,10 @@ def get_tp_fp_fn_tn(net_output, gt, axes=None, mask=None, square=False):
     fn = (1 - net_output) * y_onehot
     tn = (1 - net_output) * (1 - y_onehot)
 
-    print(tp.shape, fp.shape, fn.shape, tn.shape)
+    tp = tp * torch.sum(y_onehot, dim=axes)
+    fp = fp * torch.sum(y_onehot, dim=axes)
+    fn = fn * torch.sum(y_onehot, dim=axes)
+    tn = tn * torch.sum(y_onehot, dim=axes)
 
     if mask is not None:
         with torch.no_grad():
