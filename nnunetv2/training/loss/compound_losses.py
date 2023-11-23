@@ -35,6 +35,14 @@ class DC_and_CE_loss(nn.Module):
         :param target:
         :return:
         """
+        
+        indices = torch.unique(target).int()
+        indices = indices[indices != 0]
+        indices = indices[torch.randperm(indices.shape[0])]
+
+        target = torch.index_select(target, 1, indices)
+        net_output = torch.index_select(net_output, 1, indices)
+
         if self.ignore_label is not None:
             assert target.shape[1] == 1, 'ignore label is not implemented for one hot encoded target variables ' \
                                          '(DC_and_CE_loss)'
