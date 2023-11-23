@@ -1053,7 +1053,6 @@ class nnUNetTrainer(object):
         self.current_epoch += 1
 
     def export_model(self, path):
-        print(self.network)
         input = torch.randn(1, 512, 512, 1, requires_grad=False).cuda() #assuming you use 1 channel
         torch.onnx.export(self.network, input, path + "/" + self.experiment.get_name()) #where fn is the filename constructed from the index “idx”.
 
