@@ -49,6 +49,10 @@ class DC_and_CE_loss(nn.Module):
             target_dice = target
             mask = None
 
+        print("net_output.shape: ", net_output.shape)
+        print("target_dice.shape: ", target_dice.shape)
+        print("target.shape: ", target.shape)
+
         dc_loss = self.dc(net_output, target_dice, loss_mask=mask) \
             if self.weight_dice != 0 else 0
         ce_loss = self.ce(net_output, target[:, 0].long()) \
