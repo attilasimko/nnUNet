@@ -150,6 +150,8 @@ def get_tp_fp_fn_tn(net_output, gt, axes=None, mask=None, square=False):
     fn = (1 - net_output) * y_onehot
     tn = (1 - net_output) * (1 - y_onehot)
 
+    print(tp.shape, fp.shape, fn.shape, tn.shape)
+
     if mask is not None:
         with torch.no_grad():
             mask_here = torch.tile(mask, (1, tp.shape[1], *[1 for i in range(2, len(tp.shape))]))
