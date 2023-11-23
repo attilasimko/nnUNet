@@ -14,12 +14,13 @@ class RobustCrossEntropyLoss(nn.CrossEntropyLoss):
             assert target.shape[1] == 1
             target = target[:, 0]
 
-        zero_indices = torch.sum(target, dim=(0, 2, 3)).int()
-        zero_indices = torch.nonzero(zero_indices == 0)
-        print(zero_indices)
-        
-        for idx in zero_indices:
-            input[:, idx, :, :] = 0
+        indices = torch.unique(target).int()
+        indices = indices[indices != 0]
+        indices = indices[torch.randperm(indices.shape[0])]
+
+        for idx in range(input.shape[1]):
+            if idx not in indices:
+                input[:, idx, :, :] = 0
 
         return super().forward(input, target.long())
 
