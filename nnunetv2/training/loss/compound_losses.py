@@ -49,15 +49,14 @@ class DC_and_CE_loss(nn.Module):
             target_dice = target
             mask = None
 
-        net_output_dice = net_output
+        net_output_dice = torch.zeros_like(net_output)
         for batch_idx in range(target.shape[0]):
             indices = torch.unique(target[batch_idx, ...]).int()
             indices = indices[indices != 0]
             indices = indices[torch.randperm(indices.shape[0])]
 
-            for idx in range(net_output_dice.shape[1]):
-                if idx not in indices:
-                    net_output_dice[batch_idx, idx, :, :] = 0
+            for idx in indices:
+                net_output_dice[batch_idx, idx, :, :] = net_output[batch_idx, idx, :, :]
 
         dc_loss = self.dc(net_output_dice, target, loss_mask=mask) \
             if self.weight_dice != 0 else 0
