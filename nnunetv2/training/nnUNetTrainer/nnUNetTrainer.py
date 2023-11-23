@@ -1053,7 +1053,9 @@ class nnUNetTrainer(object):
         self.current_epoch += 1
 
     def export_model(self, path):
-        print(path)
+        print(self.network)
+        input = torch.randn(next(self.network.parameters()).size(), requires_grad=False).cuda() #assuming you use 1 channel
+        torch.onnx.export(self.network, input, path + "/" + self.experiment.get_name()) #where fn is the filename constructed from the index “idx”.
 
     def save_checkpoint(self, filename: str) -> None:
         if self.local_rank == 0:
