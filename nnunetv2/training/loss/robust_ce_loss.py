@@ -21,9 +21,9 @@ class RobustCrossEntropyLoss(nn.CrossEntropyLoss):
             indices = indices[torch.randperm(indices.shape[0])]
 
             for idx in indices:
-                    input[batch_idx, idx, :, :] = input[batch_idx, idx, :, :]
+                    input_ce[batch_idx, idx, :, :] = input[batch_idx, idx, :, :]
 
-        return super().forward(input, target.long())
+        return super().forward(input_ce, target.long())
 
 
 class TopKLoss(RobustCrossEntropyLoss):
